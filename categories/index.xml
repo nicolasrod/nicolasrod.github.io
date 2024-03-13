@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Coding Stories</title>
+    <link>https://nicolasrod.github.io/categories/</link>
+    <description>Recent content in Categories on Coding Stories</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Nicolás Rodriguez</copyright>
+    <lastBuildDate>Wed, 13 Mar 2024 03:53:32 -0300</lastBuildDate><atom:link href="https://nicolasrod.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>migration</title>
+      <link>https://nicolasrod.github.io/categories/migration/</link>
+      <pubDate>Wed, 13 Mar 2024 03:53:32 -0300</pubDate>
+      
+      <guid>https://nicolasrod.github.io/categories/migration/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>mssql</title>
+      <link>https://nicolasrod.github.io/categories/mssql/</link>
+      <pubDate>Wed, 13 Mar 2024 03:53:32 -0300</pubDate>
+      
+      <guid>https://nicolasrod.github.io/categories/mssql/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>refactoring</title>
+      <link>https://nicolasrod.github.io/categories/refactoring/</link>
+      <pubDate>Wed, 13 Mar 2024 03:53:32 -0300</pubDate>
+      
+      <guid>https://nicolasrod.github.io/categories/refactoring/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vb6</title>
+      <link>https://nicolasrod.github.io/categories/vb6/</link>
+      <pubDate>Wed, 13 Mar 2024 03:53:32 -0300</pubDate>
+      
+      <guid>https://nicolasrod.github.io/categories/vb6/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

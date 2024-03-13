@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<style type=text/css>body{font-family:monospace;}</style>
+	<title>A New Challenge</title>
+	
+	
+	<link rel="stylesheet" href="/css/style.css">
+	
+	
+</head>
+<body>
+	<header>
+	====================<br>
+	== <a href="https://nicolasrod.github.io/">Coding Stories</a> ==<br>
+	====================
+	<div style="float: right;">Programming notes and stories... and maybe minor rants</div><br>
+	<p>
+	<nav>
+			<a href="/"><b>Start</b></a>.
+			
+			
+			<a href="/posts/"><b>Posts</b></a>.
+			
+			<a href="/tags/"><b>Tags</b></a>.
+			
+	</nav>
+	</p>
+	
+</header>
+
+	
+	<main>
+		<article>
+			<h1>A New Challenge</h1>
+			<b><time>13.03.2024</time></b>
+		       
+		           <a href="/tags/refactoring">refactoring</a>
+        	       
+		           <a href="/tags/migration">migration</a>
+        	       
+		           <a href="/tags/vb6">vb6</a>
+        	       
+		           <a href="/tags/mssql">mssql</a>
+        	       
+
+			<div>
+				<p>A client of a friend of mine has been looking for someone to take care of an old Visual Basic 6 application (Client/Server
+architecture with a Microsoft SQL Server 2008 database) they had been using to run their business the past 20 years.
+I jumped on board mainly because what was bothering him was the fact that it has an online invoicing system that talks to the local Tax
+Authority (TA) and it was a real pain to work with -e.g. multiple errors in the process of creating an invoice and the fact that
+it sometimes took 10 minutes from clicking a button to getting a PDF invoice-.
+I&rsquo;d already built a Selenium-based application that takes a JSON file and creates an invoice with the TA &rsquo;s online application for my
+girlfriend&rsquo;s job, so it was trivial to adapt it.</p>
+<p>I&rsquo;ve been a developer for more than 30 years and I still can&rsquo;t estimate time!
+To be fair, I was not told many things, and in the heat of the moment - bringing a VB6 application into the modern era - I forgot to
+do my due diligence.</p>
+<p>To make a long story short, the technical debt was not the only thing to worry about. A lot of people were going through this codebase
+and a lot of things were half done. New requirements needed for the TA Invoicing application were completely missing from the source code.
+I had to take care of those first - not to mention the bureaucracy involved in moving from one system to another.</p>
+<p>The thing I love about this kind of work is that I feel like I am back in the late 80&rsquo;s/early 90&rsquo;s. Old Windows machines (clients and
+servers), lots of restrictions and low-hanging fruit to pick.</p>
+<p>Knowing I could not stop myself from refactoring code, I sailed into a new adventure, cutting code pages in half, trimming duplicate
+code, optimizing SQL Server views and stored procedures - fortunately, it&rsquo;s relatively painless to profile queries - and bringing back
+from the dead the VB6 code.</p>
+<p>I had to add several missing pieces to the puzzle:</p>
+<ul>
+<li>Base64 encoding</li>
+<li>JSON parsing</li>
+<li>HTTP/HTTPS request and response handling</li>
+<li>Multipart form handling</li>
+<li>Process execution and capture of STDOUT/STDERR to communicate with local binaries</li>
+</ul>
+<p>I&rsquo;m still adding things from time to time, like a module to create Excel XLSX files from database recordsets. The idea is to take this code,
+modernize it, make it platform agnostic and the automatically convert Visual Basic 6 forms and modules to a Golang Web Application.
+The first parts are done: the Invoice generation via ChromeDriver and the Excel XLSX file creation based on a text &ldquo;command file&rdquo; are
+implemented in Golang in a virtualized Linux server.
+The finished stack would be a Golang Web Application with a PostgreSQL backend (I&rsquo;ve already made the scripts to migrate Tables/Views/Stored
+Procedures to PostgreSQL) and accesible only by Web Browser.
+I&rsquo;ve got a few roadblocks to overcome in order to do a complete migration, but all of them are &ldquo;human related&rdquo;. It&rsquo;s not easy to change
+workstations and working environments for normal users. So, we&rsquo;re just taking it easy, step by step.
+I plan to write about each interesting piece of this puzzle and publish code for different things I&rsquo;ve made.
+The first part it&rsquo;s going to be probably the &ldquo;Remote Procedure Call (RPC)&rdquo; routines in VB6 that interfaces with the HTTPS REST service
+used to create the invoices.
+Cheers!</p>
+
+			</div>
+		</article>
+	</main>
+<aside>
+	<div>
+		<div>
+			<h3>LATEST POSTS</h3>
+		</div>
+		<div>
+			<ul>
+				
+				<li><a href="/posts/2024-03-13-a-new-challenge/">A New Challenge</a></li>
+				
+			</ul>
+		</div>
+	</div>
+</aside>
+
+
+	<footer>
+	<p>&copy; 2024 <a href="https://nicolasrod.github.io/"><b>Nicolás Rodriguez</b></a>.
+	<a href="https://github.com/nicolasrod"><b>Github</b></a>.
+	<a href="https://www.linkedin.com/in/nicolasrod78/"><b>LinkedIN</b></a>.
+	<a href="mailto:nicolasrod@gmail.com"><b>eMail</b></a>.
+	</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>mssql on Coding Stories</title>
+    <link>https://nicolasrod.github.io/tags/mssql/</link>
+    <description>Recent content in mssql on Coding Stories</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Nicolás Rodriguez</copyright>
+    <lastBuildDate>Wed, 13 Mar 2024 03:53:32 -0300</lastBuildDate><atom:link href="https://nicolasrod.github.io/tags/mssql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A New Challenge</title>
+      <link>https://nicolasrod.github.io/posts/2024-03-13-a-new-challenge/</link>
+      <pubDate>Wed, 13 Mar 2024 03:53:32 -0300</pubDate>
+      
+      <guid>https://nicolasrod.github.io/posts/2024-03-13-a-new-challenge/</guid>
+      <description>A client of a friend of mine has been looking for someone to take care of an old Visual Basic 6 application (Client/Server architecture with a Microsoft SQL Server 2008 database) they had been using to run their business the past 20 years. I jumped on board mainly because what was bothering him was the fact that it has an online invoicing system that talks to the local Tax Authority (TA) and it was a real pain to work with -e.</description>
+    </item>
+    
+  </channel>
+</rss>
