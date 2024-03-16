@@ -2,13 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://nicolasrod.github.io/posts/2024-03-13-a-new-challenge/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
     <loc>https://nicolasrod.github.io/categories/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
   </url><url>
     <loc>https://nicolasrod.github.io/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/tags/error-handling/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/categories/error-handling/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/posts/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/tags/refactoring/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/categories/refactoring/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/tags/rust/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/categories/rust/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/tags/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/tags/vb6/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/categories/vb6/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/posts/2024-03-14-vb6-error-handling-today/</loc>
+    <lastmod>2024-03-14T18:57:46-03:00</lastmod>
+  </url><url>
+    <loc>https://nicolasrod.github.io/posts/2024-03-13-a-new-challenge/</loc>
     <lastmod>2024-03-13T03:53:32-03:00</lastmod>
   </url><url>
     <loc>https://nicolasrod.github.io/tags/migration/</loc>
@@ -21,24 +54,6 @@
     <lastmod>2024-03-13T03:53:32-03:00</lastmod>
   </url><url>
     <loc>https://nicolasrod.github.io/categories/mssql/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
-    <loc>https://nicolasrod.github.io/posts/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
-    <loc>https://nicolasrod.github.io/tags/refactoring/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
-    <loc>https://nicolasrod.github.io/categories/refactoring/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
-    <loc>https://nicolasrod.github.io/tags/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
-    <loc>https://nicolasrod.github.io/tags/vb6/</loc>
-    <lastmod>2024-03-13T03:53:32-03:00</lastmod>
-  </url><url>
-    <loc>https://nicolasrod.github.io/categories/vb6/</loc>
     <lastmod>2024-03-13T03:53:32-03:00</lastmod>
   </url>
 </urlset>
