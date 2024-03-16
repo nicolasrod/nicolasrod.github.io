@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<style type=text/css>body{font-family:monospace;}</style>
+	<title>Visual Basic 6 and Error Handling Today</title>
+	
+	
+	<link rel="stylesheet" href="/css/style.css">
+	
+	
+</head>
+<body>
+	<header>
+	====================<br>
+	== <a href="https://nicolasrod.github.io/">Coding Stories</a> ==<br>
+	====================
+	<div style="float: right;">Programming notes and stories... and maybe minor rants</div><br>
+	<p>
+	<nav>
+			<a href="/"><b>Start</b></a>.
+			
+			
+			<a href="/posts/"><b>Posts</b></a>.
+			
+			<a href="/tags/"><b>Tags</b></a>.
+			
+	</nav>
+	</p>
+	
+</header>
+
+	
+	<main>
+		<article>
+			<h1>Visual Basic 6 and Error Handling Today</h1>
+			<b><time>14.03.2024</time></b>
+		       
+		           <a href="/tags/vb6">vb6</a>
+        	       
+		           <a href="/tags/refactoring">refactoring</a>
+        	       
+		           <a href="/tags/error-handling">error-handling</a>
+        	       
+		           <a href="/tags/rust">rust</a>
+        	       
+
+			<div>
+				<p>Given the fact I&rsquo;m going to have to live with this large codebase for a long time by my side, I decided to
+modernize some aspects of VB6 I really hate with all my guts. One of those is <strong>Error Handling</strong>.</p>
+<p>Visual Basic 6 do not have descriptive stack traces on runtime errors and it was fairly common to add
+<strong>On Error Goto</strong> handlers on parts of the code that wasn&rsquo;t really necessary. There were tools to automatically
+add error handling blocks on <em>EVERY</em> function and subroutine, and in my experience it was quite common to
+add it since it&rsquo;s better to have an error with a function name (and if you were mad enough, line numbers!) than
+having an error says just <strong>&ldquo;Type mismatch&rdquo;</strong>.</p>
+<p>The first thing I did was to remove each and every error handling block from all of the functions and subs,
+leaving only error handlers were there is a possiblity of getting an error. Oh, and library functions all have
+error handling blocks&hellip; but they do not bubble up errors as it is common in languages with Exceptions.
+The next thing I did is create a simple &ldquo;adaptation&rdquo; of the errors-as-return-values mantra of Rust and made
+some utility functions like the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-vb" data-lang="vb"><span style="display:flex;"><span><span style="color:#66d9ef">Private</span> <span style="color:#66d9ef">Const</span> TYPE_ERROR <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;-*ERROR*-&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">AsError</span>(<span style="color:#66d9ef">Optional</span> o <span style="color:#f92672">As</span> <span style="color:#66d9ef">Object</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">Nothing</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">If</span> o <span style="color:#f92672">Is</span> <span style="color:#66d9ef">Nothing</span> <span style="color:#66d9ef">Then</span>
+</span></span><span style="display:flex;"><span>    AsError <span style="color:#f92672">=</span> ErrorNew(Err.Number, Err.Source, Err.Description)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">Exit</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">End</span> <span style="color:#66d9ef">If</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  AsError <span style="color:#f92672">=</span> ErrorNew(o.Number, o.Source, o.Description)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">IsError</span>(v <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">Boolean</span>
+</span></span><span style="display:flex;"><span>  IsError <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">If</span> IsArray(v) <span style="color:#66d9ef">Then</span>
+</span></span><span style="display:flex;"><span>    IsError <span style="color:#f92672">=</span> (v(0) <span style="color:#f92672">=</span> TYPE_ERROR)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">End</span> <span style="color:#66d9ef">If</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">Try</span>(<span style="color:#66d9ef">Optional</span> r <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Call</span> RaiseIfError(r)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Try</span> <span style="color:#f92672">=</span> r
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Sub</span> <span style="color:#a6e22e">RaiseIfError</span>(<span style="color:#66d9ef">Optional</span> v <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">If</span> IsError(v) <span style="color:#66d9ef">Then</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">Call</span> Err.Raise(v(1), v(2), v(3))
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">End</span> <span style="color:#66d9ef">If</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Sub</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">GetErrMessage</span>(v <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>
+</span></span><span style="display:flex;"><span>  GetErrMessage <span style="color:#f92672">=</span> v(3)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">GetErrSource</span>(v <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>
+</span></span><span style="display:flex;"><span>  GetErrSource <span style="color:#f92672">=</span> v(2)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">GetErrNumber</span>(v <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">Long</span>
+</span></span><span style="display:flex;"><span>  GetErrNumber <span style="color:#f92672">=</span> v(1)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">ErrorNew</span>(<span style="color:#66d9ef">ByVal</span> Number <span style="color:#f92672">As</span> <span style="color:#66d9ef">Long</span>, <span style="color:#66d9ef">ByVal</span> Source <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>, <span style="color:#66d9ef">ByVal</span> Desc <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>) <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">If</span> Number <span style="color:#f92672">=</span> 0 <span style="color:#66d9ef">Then</span>
+</span></span><span style="display:flex;"><span>    ErrorNew <span style="color:#f92672">=</span> Array(vbNullString, 0, vbNullString, vbNullString)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Else</span>
+</span></span><span style="display:flex;"><span>    ErrorNew <span style="color:#f92672">=</span> Array(TYPE_ERROR, Number, Source, Desc)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">End</span> <span style="color:#66d9ef">If</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span></code></pre></div><p>You&rsquo;re probably thinking: &ldquo;What&rsquo;s the point of this?&rdquo;. The idea is that a function can return an &ldquo;Error&rdquo;
+type or the return value of the operation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-vb" data-lang="vb"><span style="display:flex;"><span><span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">GetWSVersion</span>() <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> r <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>
+</span></span><span style="display:flex;"><span>  r <span style="color:#f92672">=</span> WebRequest(WS_URL <span style="color:#f92672">&amp;</span> <span style="color:#e6db74">&#34;/version&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;GET&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">If</span> IsError(r) <span style="color:#66d9ef">Then</span>
+</span></span><span style="display:flex;"><span>    GetVersion <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;&lt; No Connection! &gt;&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">Exit</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">End</span> <span style="color:#66d9ef">If</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  GetVersion <span style="color:#f92672">=</span> <span style="color:#66d9ef">CStr</span>(r)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span></code></pre></div><p>In this case, if <strong>r</strong> is an error we return a custom message as the version number. If not, we return
+the Web Service version string.</p>
+<p>We can still &ldquo;bubble up&rdquo; the error like doing a <code>Err.Raise</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-vb" data-lang="vb"><span style="display:flex;"><span><span style="color:#66d9ef">Public</span> <span style="color:#66d9ef">Function</span> <span style="color:#a6e22e">GenerateInvoice</span>(<span style="color:#66d9ef">ByVal</span> ft <span style="color:#f92672">As</span> Dictionary) <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> r <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>
+</span></span><span style="display:flex;"><span>  r <span style="color:#f92672">=</span> <span style="color:#66d9ef">Try</span>(WebRequest(WS_URL <span style="color:#f92672">&amp;</span> <span style="color:#e6db74">&#34;/generate_invoice&#34;</span>, JSON.toString(ft)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> oDict <span style="color:#f92672">As</span> <span style="color:#66d9ef">Object</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Set</span> oDict <span style="color:#f92672">=</span> JSON.parse(<span style="color:#66d9ef">CStr</span>(r))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  GenerateInvoice <span style="color:#f92672">=</span> oDict!invoice_number
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Sub</span> <span style="color:#a6e22e">Test</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">On</span> <span style="color:#66d9ef">Error</span> <span style="color:#66d9ef">Goto</span> InvoiceError
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> sNumber <span style="color:#f92672">As</span> <span style="color:#66d9ef">String</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> ft <span style="color:#f92672">As</span> Dictionary
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Set</span> ft <span style="color:#f92672">=</span> <span style="color:#66d9ef">New</span> Dictionary
+</span></span><span style="display:flex;"><span>  ft!first_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;first&#34;</span>
+</span></span><span style="display:flex;"><span>  ft!last_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;last&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  sNumber <span style="color:#f92672">=</span> GenerateInvoice(ft)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Call</span> Debug.Print(<span style="color:#e6db74">&#34;Invoice Created as #&#34;</span> <span style="color:#f92672">&amp;</span> sNumber)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Exit</span> <span style="color:#66d9ef">Sub</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">InvoiceError</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Call</span> Debug.Print(<span style="color:#e6db74">&#34;Error creating the invoice: &#34;</span> <span style="color:#f92672">&amp;</span> Err.Description)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Sub</span>
+</span></span></code></pre></div><p>We can see above that instead of checking the return value for an error it uses <strong>Try()</strong>. If the value is an
+error, it is &ldquo;bubble up&rdquo; to the next error handling block in the call stack.</p>
+<p>It is useful to have it both ways, moreso while you&rsquo;re refactoring a large codebase.</p>
+<p>Assertions was my next stab at the ancient codebase:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-vb" data-lang="vb"><span style="display:flex;"><span><span style="color:#66d9ef">Private</span> <span style="color:#66d9ef">Sub</span> <span style="color:#a6e22e">AssertArray</span>(<span style="color:#66d9ef">ByVal</span> ErrorNo <span style="color:#f92672">As</span> <span style="color:#66d9ef">Long</span>, <span style="color:#66d9ef">ByVal</span> Conds <span style="color:#f92672">As</span> <span style="color:#66d9ef">Variant</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> nItems <span style="color:#f92672">As</span> <span style="color:#66d9ef">Integer</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Dim</span> nItem <span style="color:#f92672">As</span> <span style="color:#66d9ef">Integer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  nItems <span style="color:#f92672">=</span> UBound(Conds)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">For</span> nItem <span style="color:#f92672">=</span> 0 <span style="color:#66d9ef">To</span> nItems <span style="color:#66d9ef">Step</span> 2
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">If</span> Conds(nItem) <span style="color:#66d9ef">Then</span>
+</span></span><span style="display:flex;"><span>      Err.Raise Number:<span style="color:#f92672">=</span>ErrorNo, Description:<span style="color:#f92672">=</span>Conds(nItem <span style="color:#f92672">+</span> 1)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">End</span> <span style="color:#66d9ef">If</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Next</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Sub</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&#39; =&gt; To avoid having to call as Assert(code, Array(p1, p2, p3))...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">Sub</span> <span style="color:#a6e22e">Assert</span>(<span style="color:#66d9ef">ByVal</span> ErrorNo <span style="color:#f92672">As</span> <span style="color:#66d9ef">Long</span>, <span style="color:#66d9ef">ParamArray</span> Conds())
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Call</span> AssertArray(ErrorNo, Conds)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Sub</span>
+</span></span></code></pre></div><p>Which allowed me to raise errors when conditions are not met:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-vb" data-lang="vb"><span style="display:flex;"><span><span style="color:#66d9ef">Sub</span> <span style="color:#a6e22e">TestAssert</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">On</span> <span style="color:#66d9ef">Error</span> <span style="color:#66d9ef">Goto</span> NoPass
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Call</span> Assert(500, Var1 <span style="color:#f92672">&lt;&gt;</span> <span style="color:#66d9ef">True</span>, <span style="color:#e6db74">&#34;Var1 is not True!&#34;</span>, Var2 <span style="color:#f92672">&lt;</span> 20, <span style="color:#e6db74">&#34;Var2 &lt; 20&#34;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">&#39;&gt; Or if you have an array with the conditions already:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">&#39;&gt; Call AssertArray(500, Array(Var1 &lt;&gt; True, &#34;Var1 is not True!&#34;, Var2 &lt; 20, &#34;Var2 &lt; 20&#34;))
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">&#39; All Good, do work!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">Call</span> WriteSomethingToDB
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Exit</span> <span style="color:#66d9ef">Sub</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">NoPass</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">&#39;&gt; Some error handling...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Sub</span>
+</span></span></code></pre></div><p>This way I only add an error handling block when the function could return an error or if the control flow
+should be interrupted in case of a falling assertion.</p>
+<p>The last fallback is a catch-all error handling block in the main subroutine that also logs this exceptional
+occurence:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-vb" data-lang="vb"><span style="display:flex;"><span><span style="color:#66d9ef">Sub</span> <span style="color:#a6e22e">Main</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">On</span> <span style="color:#66d9ef">Error</span> <span style="color:#66d9ef">Goto</span> HandleErrors
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">&#39;&gt; Initialize, Load Main Form and so on...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">Exit</span> <span style="color:#66d9ef">Sub</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">HandleErrors</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">Call</span> LogError(Err)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">End</span> <span style="color:#66d9ef">Sub</span>
+</span></span></code></pre></div><p>All of this don&rsquo;t change what is possible with Visual Basic 6, but the code seems to me cleaner, I can
+follow it easily and the exceptional behavior of functions and subroutines is encapsulated
+(works well to document its behavior also).</p>
+<p>Next time, a few goddies like dynamic handling of over 200 forms, a poor-guys RAII in VB6 and some code cleanup.</p>
+
+			</div>
+		</article>
+	</main>
+<aside>
+	<div>
+		<div>
+			<h3>LATEST POSTS</h3>
+		</div>
+		<div>
+			<ul>
+				
+				<li><a href="/posts/2024-03-14-vb6-error-handling-today/">Visual Basic 6 and Error Handling Today</a></li>
+				
+				<li><a href="/posts/2024-03-13-a-new-challenge/">A New Challenge</a></li>
+				
+			</ul>
+		</div>
+	</div>
+</aside>
+
+
+	<footer>
+	<p>&copy; 2024 <a href="https://nicolasrod.github.io/"><b>Nicolás Rodriguez</b></a>.
+	<a href="https://github.com/nicolasrod"><b>Github</b></a>.
+	<a href="https://www.linkedin.com/in/nicolasrod78/"><b>LinkedIN</b></a>.
+	<a href="mailto:nicolasrod@gmail.com"><b>eMail</b></a>.
+	</p>
+</footer>
+
+</body>
+</html>
